@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000' # Map local port 3000 to container port 3000
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    depends_on:
+      - mongo # Ensure MongoDB starts before the Node.js app
+
+  mongo:
+    image: mongo:6.0 # Use the official MongoDB image
+    container_name: mongo
+    ports:
+      - '27017:27017' # Expose MongoDB on port 27017
+    volumes:
+      - mongo-data:/data/db # Persistent storage for MongoDB
+
+volumes:
+  mongo-data:

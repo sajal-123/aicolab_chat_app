@@ -1,7 +1,9 @@
+import { connect } from 'http2';
 import app from './app';
+import { PORT } from './config/Env';
+import { connectDB } from './config/Db';
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
+connectDB().then(() => app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+})
+)
