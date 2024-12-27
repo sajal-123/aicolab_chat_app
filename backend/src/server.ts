@@ -1,4 +1,4 @@
-import { connect } from 'http2';
+
 import app from './app';
 import { PORT } from './config/Env';
 import { connectDB } from './config/Db';
