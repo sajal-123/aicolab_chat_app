@@ -20,4 +20,5 @@ userRoute.post(
 );
 
 userRoute.get('/profile', authMiddleware, UserController.getProfile);
+userRoute.get('/logout', authMiddleware, UserController.LogoutUser);
 export { userRoute };

@@ -3,6 +3,7 @@ import { createUser } from '../service/User.service'; // Ensure createUser is a 
 import { validationResult } from 'express-validator';
 import User from '../models/User.Model';
 import bcrypt from 'bcryptjs';
+import { redis } from '../config/Redis';
 // Register Controller
 export const Register = async (req: Request, res: Response): Promise<any> => {
     // Validate the request body using express-validator
@@ -55,10 +56,10 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
 
     // Destructure the email and password from the request body
     const { email, password } = req.body;
-    console.log(email,password)
+    console.log(email, password)
 
     try {
-        if (!email || !password) 
+        if (!email || !password)
             throw new Error('Email and password are required');
 
         // Check if the user exists
@@ -78,7 +79,7 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
         const token = user.generateJWT();
 
         // Send the user and token as a response
-        return res.status(200).json({
+        return res.cookie('token', token).status(200).json({
             message: "Login successful",
             user,
             token,
@@ -94,6 +95,21 @@ export const Login = async (req: Request, res: Response): Promise<any> => {
     }
 };
 export const getProfile = async (req: Request, res: Response): Promise<any> => {
-    return res.json(req.body.user);
-    
+    console.log(req.body)
+    return res.json(req.body);
 };
+
+export const LogoutUser = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        redis.set(token, "Logout", 'EX', 60 * 60 * 24);
+
+        return res.status(200).json({ message: 'Logout successful' });
+    } catch (error: any) {
+        console.log("error->",error.message);
+        return res.status(500).json(error.message);
+    }
+}
